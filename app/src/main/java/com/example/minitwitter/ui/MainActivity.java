@@ -88,6 +88,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if(response.isSuccessful()){
                         Toast.makeText(MainActivity.this, "Sesión iniciada correctamente.", Toast.LENGTH_SHORT).show();
 
+                        Intent i = new Intent(MainActivity.this, DashboardActivity.class);
+                        startActivity(i);
+
+                        //Destruimos este activity para que no se pueda volver
+                        finish();
+                    }else {
+                        Toast.makeText(MainActivity.this, "Algo salio mal. Revise sus datos de acceso.", Toast.LENGTH_SHORT).show();
                     }
                 }
 
