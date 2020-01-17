@@ -32,9 +32,14 @@ public class DashboardActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragmentContainer, new TweetListFragment())
+                .commit();
+
         /*-----------------------------------------------------------------------------------------------------*/
 
         String token = SharedPreferencesManager.getSomeStringValue(Constantes.PREF_TOKEN);
-        Toast.makeText(this, "Token: "+token, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Token: "+token, Toast.LENGTH_SHORT).show();
     }
 }

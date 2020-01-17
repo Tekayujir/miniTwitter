@@ -16,7 +16,7 @@ import com.example.minitwitter.common.SharedPreferencesManager;
 import com.example.minitwitter.retrofit.MiniTwitterClient;
 import com.example.minitwitter.retrofit.MiniTwitterService;
 import com.example.minitwitter.retrofit.request.RequestLogin;
-import com.example.minitwitter.retrofit.request.ResponseAuth;
+import com.example.minitwitter.retrofit.response.ResponseAuth;
 
 import retrofit2.Call;
 import retrofit2.Callback;

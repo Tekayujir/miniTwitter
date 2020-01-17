@@ -9,6 +9,9 @@ import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 
+/**
+ * Adjunta a cada petición la información del token en la cabecera de la petición
+ */
 public class AuthInterceptor implements Interceptor {
 
     @Override
