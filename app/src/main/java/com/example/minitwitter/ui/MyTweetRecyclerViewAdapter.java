@@ -39,37 +39,52 @@ public class MyTweetRecyclerViewAdapter extends RecyclerView.Adapter<MyTweetRecy
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
+        if(mValues != null){
+            holder.mItem = mValues.get(position);
 
-        holder.tvUsername.setText(holder.mItem.getUser().getUsername());
-        holder.tvMessage.setText(holder.mItem.getMensaje());
-        holder.tvLikesCount.setText(String.valueOf(holder.mItem.getLikes().size()));
+            holder.tvUsername.setText("@"+holder.mItem.getUser().getUsername());
+            holder.tvMessage.setText(holder.mItem.getMensaje());
+            holder.tvLikesCount.setText(String.valueOf(holder.mItem.getLikes().size()));
 
-        // Carga la foto del usuario en el tweet
-        String photo = holder.mItem.getUser().getPhotoUrl();
-        if(!photo.equals("")){
-            Glide.with(ctx)
-                    .load("https://www.minitwitter.com/apiv1/uploads/photos/" +photo)
-                    .into(holder.ivAvatar);
-        }
-
-        // Recorremos la lista para saber si estamos en esa lista y le hemos dado like
-        for(Like like: holder.mItem.getLikes()){
-            // si este USERNAME(que es único) es el mismo que el del usuario que está logeado, ha dado like (por lo tanto cambiamos el color de la imagen t el contador Like)
-            if(like.getUsername().equals(username)){
+            // Carga la foto del usuario en el tweet
+            String photo = holder.mItem.getUser().getPhotoUrl();
+            if(!photo.equals("")){
                 Glide.with(ctx)
-                        .load(R.drawable.ic_thumb_up_pink_24dp)
-                        .into(holder.ivLike);
-                holder.tvLikesCount.setTextColor(ctx.getResources().getColor(R.color.colorRosa));
-                holder.tvLikesCount.setTypeface(null, Typeface.BOLD);
-                break;
+                        .load("https://www.minitwitter.com/apiv1/uploads/photos/" +photo)
+                        .into(holder.ivAvatar);
+            }
+
+            Glide.with(ctx)
+                    .load(R.drawable.ic_thumb_up_black_24dp)
+                    .into(holder.ivLike);
+            holder.tvLikesCount.setTextColor(ctx.getResources().getColor(R.color.colorGris));
+            holder.tvLikesCount.setTypeface(null, Typeface.NORMAL);
+
+            // Recorremos la lista para saber si estamos en esa lista y le hemos dado like
+            for(Like like: holder.mItem.getLikes()){
+                // si este USERNAME(que es único) es el mismo que el del usuario que está logeado, ha dado like (por lo tanto cambiamos el color de la imagen t el contador Like)
+                if(like.getUsername().equals(username)){
+                    Glide.with(ctx)
+                            .load(R.drawable.ic_thumb_up_pink_24dp)
+                            .into(holder.ivLike);
+                    holder.tvLikesCount.setTextColor(ctx.getResources().getColor(R.color.colorRosa));
+                    holder.tvLikesCount.setTypeface(null, Typeface.BOLD);
+                    break;
+                }
             }
         }
     }
 
+    public void setData(List<Tweet> tweetList){
+        this.mValues = tweetList;
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
-        return mValues.size();
+        if(mValues != null){
+            return mValues.size();
+        }else return 0;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
