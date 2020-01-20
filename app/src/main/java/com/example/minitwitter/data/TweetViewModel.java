@@ -29,6 +29,12 @@ public class TweetViewModel extends AndroidViewModel {
         return tweets;
     }
 
+    // Este método sirve para la funcionalidad del Swipe
+    public LiveData<List<Tweet>> getNewTweets(){
+        tweets = tweetRepository.getAllTweets(); // Carga la lista de tweets del webservice del repositorio
+        return tweets;
+    }
+
     /**
      * Se invoca este método para insertar un nuevo tweet
      *
