@@ -1,12 +1,15 @@
 package com.example.minitwitter.data;
 
 import android.app.Application;
+import android.content.Context;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import com.example.minitwitter.retrofit.response.Tweet;
+import com.example.minitwitter.ui.BottomModalTweetFragment;
 
 import java.util.List;
 
@@ -68,5 +71,19 @@ public class TweetViewModel extends AndroidViewModel {
      */
     public void likeTweet(int idTweet){
         tweetRepository.likeTweet(idTweet);
+    }
+
+    /**
+     * Se invoca este método para eliminar un tweet
+     *
+     * @param idTweet
+     */
+    public void deleteTweet(int idTweet){
+        tweetRepository.deleteTweet(idTweet);
+    }
+
+    public void openDialogTweetMenu(Context ctx, int idTweet){
+        BottomModalTweetFragment dialogTweet = BottomModalTweetFragment.newInstance(idTweet);
+        dialogTweet.show(((AppCompatActivity)ctx).getSupportFragmentManager(), "BottomModalTweetFragment");
     }
 }

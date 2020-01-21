@@ -74,6 +74,19 @@ public class MyTweetRecyclerViewAdapter extends RecyclerView.Adapter<MyTweetRecy
                 }
             });
 
+            // para eliminar un tweet
+            holder.ivShowMenu.setVisibility(View.GONE);
+            // para que solo el usuario pueda eliminarlo (solo muestra el menu de eliminar al propio usuario, no a otros)
+            if(holder.mItem.getUser().getUsername().equals(username)){
+                holder.ivShowMenu.setVisibility(View.VISIBLE);
+            }
+            holder.ivShowMenu.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    tweetViewModel.openDialogTweetMenu(ctx, holder.mItem.getId());
+                }
+            });
+
             // Recorremos la lista para saber si estamos en esa lista y le hemos dado like
             for(Like like: holder.mItem.getLikes()){
                 // si este USERNAME(que es único) es el mismo que el del usuario que está logeado, ha dado like (por lo tanto cambiamos el color de la imagen t el contador Like)
@@ -105,6 +118,7 @@ public class MyTweetRecyclerViewAdapter extends RecyclerView.Adapter<MyTweetRecy
         public final View mView;
         public final ImageView ivAvatar;
         public final ImageView ivLike;
+        public final ImageView ivShowMenu;
         public final TextView tvUsername;
         public final TextView tvMessage;
         public final TextView tvLikesCount;
@@ -115,6 +129,7 @@ public class MyTweetRecyclerViewAdapter extends RecyclerView.Adapter<MyTweetRecy
             mView = view;
             ivAvatar = view.findViewById(R.id.imageViewAvatar);
             ivLike = view.findViewById(R.id.imageViewLike);
+            ivShowMenu = view.findViewById(R.id.imageViewShowMenu);
             tvUsername = view.findViewById(R.id.textViewUserName);
             tvMessage = view.findViewById(R.id.textViewMessage);
             tvLikesCount = view.findViewById(R.id.textViewLikes);

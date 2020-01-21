@@ -13,6 +13,7 @@ import com.example.minitwitter.retrofit.AuthTwitterService;
 import com.example.minitwitter.retrofit.request.RequestCreateTweet;
 import com.example.minitwitter.retrofit.response.Like;
 import com.example.minitwitter.retrofit.response.Tweet;
+import com.example.minitwitter.retrofit.response.TweetDeleted;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -184,5 +185,42 @@ public class TweetRepository {
         favTweets.setValue(newFavList);
 
         return favTweets;
+    }
+
+    /**
+     * Elimina un tweet
+     *
+     * @param idTweet
+     */
+    public void deleteTweet(final int idTweet){
+        Call<TweetDeleted> call = authTwitterService.deleteTweet(idTweet);
+
+        call.enqueue(new Callback<TweetDeleted>() {
+            @Override
+            public void onResponse(Call<TweetDeleted> call, Response<TweetDeleted> response) {
+                if(response.isSuccessful()){
+                    // Creando una lista de tweets donde los eliminados no aparezcan
+                    List<Tweet> clonedTweets = new ArrayList<>();
+                    for(int i=0; i<allTweets.getValue().size(); i++){
+                        // si el id del tweet es distinto del tweet que acabamos de eliminar, debe conservarse en la lista
+                        if(allTweets.getValue().get(i).getId() != idTweet){
+                            clonedTweets.add(new Tweet(allTweets.getValue().get(i)));
+                        }
+                    }
+
+                    allTweets.setValue(clonedTweets);
+                    getFavsTweets();
+
+                    Toast.makeText(MyApp.getContext(), "Tweet eliminado correctamente", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(MyApp.getContext(), "Algo ha salido mal.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TweetDeleted> call, Throwable t) {
+                Toast.makeText(MyApp.getContext(), "Error en la conexión.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
