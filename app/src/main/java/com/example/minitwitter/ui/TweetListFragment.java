@@ -7,7 +7,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -17,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.minitwitter.R;
+import com.example.minitwitter.common.Constantes;
 import com.example.minitwitter.data.TweetViewModel;
 import com.example.minitwitter.retrofit.response.Tweet;
 
@@ -24,10 +24,8 @@ import java.util.List;
 
 public class TweetListFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
-    private int mColumnCount = 1;
+
+    private int tweetListType = 1;
 
     RecyclerView recyclerView;
     SwipeRefreshLayout swipeRefreshLayout;
@@ -42,12 +40,10 @@ public class TweetListFragment extends Fragment {
     public TweetListFragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static TweetListFragment newInstance(int columnCount) {
+    public static TweetListFragment newInstance(int tweetListType) {
         TweetListFragment fragment = new TweetListFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putInt(Constantes.TWEET_LIST_TYPE, tweetListType);
         fragment.setArguments(args);
         return fragment;
     }
@@ -60,7 +56,7 @@ public class TweetListFragment extends Fragment {
             .get(TweetViewModel.class);
 
         if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            tweetListType = getArguments().getInt(Constantes.TWEET_LIST_TYPE);
         }
     }
 
@@ -80,15 +76,15 @@ public class TweetListFragment extends Fragment {
             @Override
             public void onRefresh() {
                 swipeRefreshLayout.setRefreshing(true);
-                loadNewData();
+                if( tweetListType == Constantes.TWEET_LIST_ALL) {
+                    loadNewData();
+                } else if( tweetListType == Constantes.TWEET_LIST_FAVS) {
+                    loadNewFavData();
+                }
             }
         });
 
-        if (mColumnCount <= 1) {
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        } else {
-            recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-        }
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
         adapter = new MyTweetRecyclerViewAdapter(
                 getActivity(),
@@ -96,10 +92,15 @@ public class TweetListFragment extends Fragment {
         );
         recyclerView.setAdapter(adapter);
 
-        loadTweetData();
+        if( tweetListType == Constantes.TWEET_LIST_ALL) {
+            loadTweetData();
+        } else if( tweetListType == Constantes.TWEET_LIST_FAVS) {
+            loadFavTweetData();
+        }
 
         return view;
     }
+
 
     /**
      * Carga el adapter con la lista de tweets
@@ -125,6 +126,34 @@ public class TweetListFragment extends Fragment {
 
                 // desactivando observer para que no se vuelva a lanzar cuando creemos un nuevo tweet
                 tweetViewModel.getNewTweets().removeObserver(this);
+            }
+        });
+    }
+
+    /**
+     * Carga el adapter con la lista de tweets con favs
+     */
+    private void loadFavTweetData() {
+        tweetViewModel.getFavTweets().observe(getActivity(), new Observer<List<Tweet>>() {
+            @Override
+            public void onChanged(List<Tweet> tweets) {
+                tweetList = tweets;
+                adapter.setData(tweetList);
+            }
+        });
+    }
+
+    // Nuevos tweets con favs para la funcionalidad del Swipe
+    private void loadNewFavData() {
+        tweetViewModel.getNewFavTweets().observe(getActivity(), new Observer<List<Tweet>>() {
+            @Override
+            public void onChanged(List<Tweet> tweets) {
+                tweetList = tweets;
+                swipeRefreshLayout.setRefreshing(false);
+                adapter.setData(tweetList);
+
+                // desactivando observer para que no se vuelva a lanzar cuando creemos un nuevo tweet fav
+                tweetViewModel.getNewFavTweets().removeObserver(this);
             }
         });
     }

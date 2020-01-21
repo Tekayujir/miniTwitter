@@ -5,13 +5,17 @@ import android.widget.Toast;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.minitwitter.common.Constantes;
 import com.example.minitwitter.common.MyApp;
+import com.example.minitwitter.common.SharedPreferencesManager;
 import com.example.minitwitter.retrofit.AuthTwitterClient;
 import com.example.minitwitter.retrofit.AuthTwitterService;
 import com.example.minitwitter.retrofit.request.RequestCreateTweet;
+import com.example.minitwitter.retrofit.response.Like;
 import com.example.minitwitter.retrofit.response.Tweet;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -26,11 +30,15 @@ public class TweetRepository {
     AuthTwitterService authTwitterService;
     AuthTwitterClient authTwitterClient;
     MutableLiveData<List<Tweet>> allTweets;
+    MutableLiveData<List<Tweet>> favTweets;
+    String userName;
+
 
     TweetRepository(){
         authTwitterClient = AuthTwitterClient.getInstance();
         authTwitterService = authTwitterClient.getAuthTwitterService();
         allTweets = getAllTweets();
+        userName = SharedPreferencesManager.getSomeStringValue(Constantes.PREF_USERNAME);
     }
 
     /**
@@ -126,6 +134,9 @@ public class TweetRepository {
                     }
 
                     allTweets.setValue(listaClonada);
+
+                    // para refrescar la lista de favs
+                    getFavsTweets();
                 }else{
                     Toast.makeText(MyApp.getContext(), "Algo ha salido mal.", Toast.LENGTH_SHORT).show();
                 }
@@ -136,5 +147,42 @@ public class TweetRepository {
                 Toast.makeText(MyApp.getContext(), "Error en la conexión.", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    /**
+     * Obtiene la lista de tweets favoritos
+     *
+     * @return lista de favs
+     */
+    public MutableLiveData<List<Tweet>> getFavsTweets(){
+        if(favTweets == null){
+            favTweets = new MutableLiveData<>();
+        }
+
+        // Recorremos la lista para saber cuales son los tweets marcados con like y cuales no
+        List<Tweet> newFavList = new ArrayList<>();
+        Iterator itTweets = allTweets.getValue().iterator();
+
+        while(itTweets.hasNext()){
+            Tweet current = (Tweet) itTweets.next(); // tweet actual
+            Iterator itLikes = current.getLikes().iterator(); // iterar los likes
+            boolean encontrado = false; // uauario no encontrado
+
+            // mientras haya elementos en la lista de likes y además no hayamos encontrado al usuario logeado en esa lista de likes, seguimos recorriendo la lista,
+            while(itLikes.hasNext() && !encontrado){
+                Like like = (Like) itLikes.next();
+                // si el nombre de usuario es igual al nombre del usuario loggeado, le ha dado like
+                if(like.getUsername().equals(userName)){
+                    encontrado = true;
+                    newFavList.add(current);
+                    //tweet con like añadido a la lista
+                }
+            }
+        }
+
+        // si algún observer está pendiente de este objeto, va a poder recibir la nueva lista de favoritos
+        favTweets.setValue(newFavList);
+
+        return favTweets;
     }
 }

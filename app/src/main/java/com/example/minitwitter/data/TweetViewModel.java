@@ -13,6 +13,7 @@ import java.util.List;
 public class TweetViewModel extends AndroidViewModel {
     private TweetRepository tweetRepository;
     private LiveData<List<Tweet>> tweets;
+    private LiveData<List<Tweet>> favTweets;
 
     public TweetViewModel(@NonNull Application application) {
         super(application);
@@ -33,6 +34,22 @@ public class TweetViewModel extends AndroidViewModel {
     public LiveData<List<Tweet>> getNewTweets(){
         tweets = tweetRepository.getAllTweets(); // Carga la lista de tweets del webservice del repositorio
         return tweets;
+    }
+
+    /**
+     * Se invoca este método para devolver la lista de tweets favoritos
+     *
+     * @return tweets favs
+     */
+    public LiveData<List<Tweet>> getFavTweets(){
+        favTweets = tweetRepository.getFavsTweets();
+        return favTweets;
+    }
+
+    // Este método sirve para la funcionalidad del Swipe / refrescar datos
+    public LiveData<List<Tweet>> getNewFavTweets(){
+        getNewTweets(); // obtiene primero toda la lista de tweets
+        return getFavTweets(); // obtiene los nuevos fav tweets
     }
 
     /**
