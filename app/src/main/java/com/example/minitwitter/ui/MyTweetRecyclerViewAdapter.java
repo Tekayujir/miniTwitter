@@ -1,5 +1,7 @@
 package com.example.minitwitter.ui;
 
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
@@ -14,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.example.minitwitter.R;
 import com.example.minitwitter.common.Constantes;
 import com.example.minitwitter.common.SharedPreferencesManager;
+import com.example.minitwitter.data.TweetViewModel;
 import com.example.minitwitter.retrofit.response.Like;
 import com.example.minitwitter.retrofit.response.Tweet;
 import java.util.List;
@@ -23,11 +26,13 @@ public class MyTweetRecyclerViewAdapter extends RecyclerView.Adapter<MyTweetRecy
     private List<Tweet> mValues;
     private Context ctx;
     String username;
+    TweetViewModel tweetViewModel;
 
     public MyTweetRecyclerViewAdapter(Context contexto, List<Tweet> items) {
         mValues = items;
         ctx = contexto;
         username = SharedPreferencesManager.getSomeStringValue(Constantes.PREF_USERNAME);
+        tweetViewModel = ViewModelProviders.of((FragmentActivity) ctx).get(TweetViewModel.class); // instanciando el viewModel en el constructor del adapter
     }
 
     @Override
@@ -54,11 +59,20 @@ public class MyTweetRecyclerViewAdapter extends RecyclerView.Adapter<MyTweetRecy
                         .into(holder.ivAvatar);
             }
 
+            // para cargar bien los likes al scrollear rápido
             Glide.with(ctx)
                     .load(R.drawable.ic_thumb_up_black_24dp)
                     .into(holder.ivLike);
             holder.tvLikesCount.setTextColor(ctx.getResources().getColor(R.color.colorGris));
             holder.tvLikesCount.setTypeface(null, Typeface.NORMAL);
+
+            // para dar los likes
+            holder.ivLike.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    tweetViewModel.likeTweet(holder.mItem.getId());
+                }
+            });
 
             // Recorremos la lista para saber si estamos en esa lista y le hemos dado like
             for(Like like: holder.mItem.getLikes()){

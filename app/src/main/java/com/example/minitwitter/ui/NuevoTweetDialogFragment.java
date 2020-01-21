@@ -90,7 +90,7 @@ public class NuevoTweetDialogFragment extends DialogFragment implements View.OnC
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         // 2. Chain together various setter methods to set the dialog characteristics
-        builder.setMessage("¿Desea realmente eliminar el tweet? El mensaje se borrará")
+        builder.setMessage("¿Desea realmente eliminar el tweet? El mensaje se borrará.")
                 .setTitle("Cancelar");
 
         // Add the buttons

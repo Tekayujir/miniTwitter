@@ -43,4 +43,13 @@ public class TweetViewModel extends AndroidViewModel {
     public void insertTweet(String mensaje){
         tweetRepository.createTweet(mensaje);
     }
+
+    /**
+     * Se invoca este método para dar un like
+     *
+     * @param idTweet
+     */
+    public void likeTweet(int idTweet){
+        tweetRepository.likeTweet(idTweet);
+    }
 }
